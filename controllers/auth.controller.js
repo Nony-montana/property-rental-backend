@@ -4,28 +4,33 @@ const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 
 let transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: "gmail",
   auth: {
     user: process.env.NODE_MAIL,
-    pass: process.env.NODE_PASS
-  }
+    pass: process.env.NODE_PASS,
+  },
 });
 
 // REGISTER
 const register = async (req, res) => {
-  const { name, email, password, role, phone } = req.body;
+  const { firstName, lastName, email, password, role, phone } = req.body;
   try {
     const saltround = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, saltround);
 
     const user = await User.create({
-      name, email, password: hashedPassword, role, phone
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
+      role,
+      phone,
     });
 
     const token = await jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1h" },
     );
 
     // Send welcome email
@@ -33,10 +38,10 @@ const register = async (req, res) => {
       const mailOptions = {
         from: process.env.NODE_MAIL,
         to: email,
-        subject: `Welcome to the platform, ${name}`,
-        html: `<h2>Welcome, ${name}!</h2>
-               <p>Your account has been created successfully as a <strong>${role}</strong>.</p>
-               <p>Start exploring properties today!</p>`
+        subject: `Welcome to HomeFind, ${firstName}!`,
+        html: `<h2>Welcome, ${firstName}!</h2>
+       <p>Your account has been created successfully as a <strong>${role}</strong>.</p>
+       <p>Start exploring properties today!</p>`,
       };
       await transporter.sendMail(mailOptions);
       console.log("Welcome email sent");
@@ -46,10 +51,9 @@ const register = async (req, res) => {
 
     res.status(201).send({
       message: "User created successfully",
-      data: { name, email, role, phone },
+      data: { firstName, lastName, email, role, phone },
       token,
     });
-
   } catch (error) {
     console.log(error);
     if (error.code == 11000) {
@@ -76,7 +80,7 @@ const login = async (req, res) => {
     const token = await jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: "5h" }
+      { expiresIn: "5h" },
     );
 
     res.status(200).send({
@@ -85,13 +89,13 @@ const login = async (req, res) => {
         id: user._id,
         email: user.email,
         role: user.role,
-        name: user.name,
+        firstName: user.firstName,
+        lastName: user.lastName,
         phone: user.phone,
         createdAt: user.createdAt,
       },
       token,
     });
-
   } catch (error) {
     console.log(error);
     res.status(404).send({ message: "Invalid credentials" });

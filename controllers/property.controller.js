@@ -3,16 +3,15 @@ const Property = require("../models/property.model");
 // CREATE A PROPERTY (landlords only)
 const createProperty = async (req, res) => {
   try {
-    const {
-      title,
-      description,
-      price,
-      location,
-      propertyType,
-      images,
-      bedrooms,
-      bathrooms,
-    } = req.body;
+    const { title, description, price, propertyType, bedrooms, bathrooms } = req.body;
+
+    const location = {
+      address: req.body['location[address]'],
+      city: req.body['location[city]'],
+      state: req.body['location[state]'],
+    };
+
+    const images = req.files ? req.files.map((file) => file.path) : [];
 
     const property = await Property.create({
       title,
@@ -26,9 +25,7 @@ const createProperty = async (req, res) => {
       landlord: req.user.id,
     });
 
-    res
-      .status(201)
-      .json({ message: "Property created successfully", data: property });
+    res.status(201).json({ message: "Property created successfully", data: property });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -65,6 +62,16 @@ const getSingleProperty = async (req, res) => {
     res
       .status(200)
       .json({ message: "Property fetched successfully", data: property });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// GET LANDLORD'S OWN PROPERTIES
+const getMyProperties = async (req, res) => {
+  try {
+    const properties = await Property.find({ landlord: req.user.id });
+    res.status(200).json({ message: "Properties fetched successfully", data: properties });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -124,4 +131,5 @@ module.exports = {
   getSingleProperty,
   updateProperty,
   deleteProperty,
+  getMyProperties,
 };

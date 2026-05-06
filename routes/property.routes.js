@@ -6,11 +6,13 @@ const {
   getSingleProperty,
   updateProperty,
   deleteProperty,
+  getMyProperties,
 } = require("../controllers/property.controller");
 const { verifyToken, isLandlord } = require("../middleware/auth.middleware");
 
 // PUBLIC ROUTES (no login needed)
 router.get("/", getAllProperties);
+router.get("/my-properties", verifyToken, isLandlord, getMyProperties);
 router.get("/:id", getSingleProperty);
 
 // PROTECTED ROUTES (login + landlord only)

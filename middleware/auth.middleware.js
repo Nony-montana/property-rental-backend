@@ -22,7 +22,7 @@ const verifyToken = (req, res, next) => {
 
 // CHECK IF USER IS A LANDLORD
 const isLandlord = (req, res, next) => {
-  if (req.user.role !== "landlord") {
+  if (req.user.role !== "LANDLORD") {
     return res.status(403).json({ message: "Access denied, landlords only" });
   }
   next();
