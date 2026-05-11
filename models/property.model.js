@@ -21,6 +21,7 @@ const propertySchema = new mongoose.Schema({
     required: true,
   },
   isAvailable: { type: Boolean, default: true },
+  isFeatured: { type: Boolean, default: false },
   bedrooms: { type: Number },
   bathrooms: { type: Number },
 }, { timestamps: true });

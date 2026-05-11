@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const http = require("http");
 const { Server } = require("socket.io");
+const adminRoutes = require("./routes/admin.routes");
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/properties", propertyRoutes);
 app.use("/api/chats", chatRoutes);
+app.use("/api/admin", adminRoutes);
 
 
 // SOCKET.IO
