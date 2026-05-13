@@ -33,7 +33,6 @@ const register = async (req, res) => {
       { expiresIn: "1h" },
     );
 
-    // Send welcome email
     try {
       const mailOptions = {
         from: process.env.NODE_MAIL,
@@ -77,10 +76,17 @@ const login = async (req, res) => {
       return res.status(404).send({ message: "Invalid credentials" });
     }
 
+    // Block deactivated accounts
+    if (user.isActive === false) {
+      return res.status(403).send({
+        message: "Your account has been deactivated. Please contact support.",
+      });
+    }
+
     const token = await jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: "5h" },
+      { expiresIn: "24h" },
     );
 
     res.status(200).send({
@@ -92,6 +98,8 @@ const login = async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         phone: user.phone,
+        isVerified: user.isVerified,
+        isActive: user.isActive,
         createdAt: user.createdAt,
       },
       token,
@@ -101,7 +109,5 @@ const login = async (req, res) => {
     res.status(404).send({ message: "Invalid credentials" });
   }
 };
-
-
 
 module.exports = { register, login };

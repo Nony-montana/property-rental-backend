@@ -35,10 +35,7 @@ const createProperty = async (req, res) => {
 // GET ALL PROPERTIES (everyone can see)
 const getAllProperties = async (req, res) => {
   try {
-    const properties = await Property.find({ isAvailable: true }).populate(
-      "landlord",
-      "firstName lastName email phone",
-    );
+    const properties = await Property.find({ isAvailable: true }).populate("landlord", "firstName lastName email phone isVerified")
 
     res
       .status(200)
@@ -51,10 +48,7 @@ const getAllProperties = async (req, res) => {
 // GET A SINGLE PROPERTY
 const getSingleProperty = async (req, res) => {
   try {
-    const property = await Property.findById(req.params.id).populate(
-      "landlord",
-      "firstName lastName email phone",
-    );
+    const property = await Property.findById(req.params.id).populate("landlord", "firstName lastName email phone isVerified")
 
     if (!property) {
       return res.status(404).json({ message: "Property not found" });
