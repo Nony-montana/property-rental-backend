@@ -84,18 +84,31 @@ const updateProperty = async (req, res) => {
     }
 
     if (property.landlord.toString() !== req.user.id) {
-      return res
-        .status(403)
-        .json({ message: "You can only update your own properties" });
+      return res.status(403).json({ message: "You can only update your own properties" });
     }
 
-    const updated = await Property.findByIdAndUpdate(req.params.id, req.body, {
-      returnDocument: "after",
-    });
+    const { title, description, price, propertyType, bedrooms, bathrooms, address, city, state } = req.body;
 
-    res
-      .status(200)
-      .json({ message: "Property updated successfully", data: updated });
+    const location = {
+      address: address || property.location.address,
+      city: city || property.location.city,
+      state: state || property.location.state,
+    };
+
+    const imageUrls = req.files && req.files.length > 0
+      ? req.files.map((file) => file.path)
+      : property.images;
+
+    const updated = await Property.findByIdAndUpdate(
+      req.params.id,
+      {
+        title, description, price, propertyType,
+        bedrooms, bathrooms, location, images: imageUrls
+      },
+      { new: true }
+    );
+
+    res.status(200).json({ message: "Property updated successfully", data: updated });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
