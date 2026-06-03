@@ -137,6 +137,19 @@ const toggleFeatured = async (req, res) => {
   }
 };
 
+const getAllChatsAdmin = async (req, res) => {
+  try {
+    const chats = await Chat.find()
+      .populate("property", "title")
+      .populate("landlord", "firstName lastName email")
+      .populate("tenant", "firstName lastName email")
+      .sort({ lastMessageTime: -1 });
+    res.status(200).json({ message: "Chats fetched", data: chats });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getDashboardStats,
   getAllUsers,
@@ -146,4 +159,5 @@ module.exports = {
   toggleUserStatus,
   toggleVerified,
   toggleFeatured,
+  getAllChatsAdmin,
 };

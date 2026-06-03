@@ -3,17 +3,24 @@ const jwt = require("jsonwebtoken");
 // CHECK IF USER IS LOGGED IN
 const verifyToken = (req, res, next) => {
   try {
+    // Check header first, then cookie
     const authHeader = req.headers.authorization;
+    const cookieToken = req.cookies?.token;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    let token;
+
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      token = authHeader.split(" ")[1];
+    } else if (cookieToken) {
+      token = cookieToken;
+    }
+
+    if (!token) {
       return res.status(401).json({ message: "No token, access denied" });
     }
 
-    const token = authHeader.split(" ")[1];
-
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
-
     next();
   } catch (error) {
     res.status(401).json({ message: "Invalid or expired token" });

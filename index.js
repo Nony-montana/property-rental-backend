@@ -11,6 +11,8 @@ const connectDB = require("./config/connectDB");
 const authRoutes = require("./routes/auth.routes");
 const propertyRoutes = require("./routes/property.routes");
 const chatRoutes = require("./routes/chat.routes");
+const cookieParser = require('cookie-parser');
+
 
 connectDB();
 
@@ -18,12 +20,17 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3001",
+    origin: "http://localhost:3000",
     methods: ["GET", "POST"],
   },
 });
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+}));
+app.use(cookieParser());
+
 app.use(express.json());
 
 app.get("/", (req, res) => {
@@ -34,6 +41,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/properties", propertyRoutes);
 app.use("/api/chats", chatRoutes);
 app.use("/api/admin", adminRoutes);
+
 
 
 // SOCKET.IO

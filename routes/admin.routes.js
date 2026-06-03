@@ -9,6 +9,7 @@ const {
   toggleUserStatus,
   toggleVerified,
   toggleFeatured,
+  getAllChatsAdmin,
 } = require("../controllers/admin.controller");
 const { verifyToken } = require("../middleware/auth.middleware");
 const { isAdmin } = require("../middleware/admin.middleware");
@@ -22,5 +23,6 @@ router.delete("/properties/:id", verifyToken, isAdmin, deletePropertyAdmin);
 router.put("/users/:id/toggle-status", verifyToken, isAdmin, toggleUserStatus);
 router.put("/users/:id/toggle-verified", verifyToken, isAdmin, toggleVerified);
 router.put("/properties/:id/toggle-featured", verifyToken, isAdmin, toggleFeatured);
+router.get("/chats", verifyToken, isAdmin, getAllChatsAdmin);
 
 module.exports = router;
