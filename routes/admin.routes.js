@@ -10,6 +10,7 @@ const {
   toggleVerified,
   toggleFeatured,
   getAllChatsAdmin,
+  getAuditLogs
 } = require("../controllers/admin.controller");
 const { verifyToken } = require("../middleware/auth.middleware");
 const { isAdmin } = require("../middleware/admin.middleware");
