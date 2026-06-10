@@ -5,7 +5,6 @@ const http = require("http");
 const { Server } = require("socket.io");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
-const xss = require("xss-clean");
 const mongoSanitize = require("express-mongo-sanitize");
 const cookieParser = require("cookie-parser");
 
@@ -58,8 +57,6 @@ app.use(cookieParser());
 // 5. Body parser
 app.use(express.json());
 
-// 6. XSS protection — strip malicious HTML/script tags from inputs
-app.use(xss());
 
 // 7. MongoDB injection protection — sanitize query operators
 app.use(mongoSanitize());
