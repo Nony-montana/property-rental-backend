@@ -5,7 +5,6 @@ const http = require("http");
 const { Server } = require("socket.io");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
-const mongoSanitize = require("express-mongo-sanitize");
 const cookieParser = require("cookie-parser");
 
 dotenv.config();
@@ -58,8 +57,7 @@ app.use(cookieParser());
 app.use(express.json());
 
 
-// 7. MongoDB injection protection — sanitize query operators
-app.use(mongoSanitize());
+
 
 // 8. Global rate limiting — max 100 requests per 15 minutes
 const globalLimiter = rateLimit({
