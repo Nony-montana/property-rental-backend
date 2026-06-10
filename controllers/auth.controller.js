@@ -153,103 +153,24 @@ const register = async (req, res) => {
   }
 };
 
-/// LOGIN
+// LOGIN
 const login = async (req, res) => {
-  const { email, password, otp } = req.body;
+  const { email, password } = req.body;
   try {
     const user = await User.findOne({ email }).select("+password");
-    if (!user) return res.status(404).send({ message: "Invalid credentials" });
+    if (!user) {
+      return res.status(404).send({ message: "Invalid credentials" });
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(404).send({ message: "Invalid credentials" });
+    if (!isMatch) {
+      return res.status(404).send({ message: "Invalid credentials" });
+    }
 
     if (user.isActive === false) {
       return res.status(403).send({
         message: "Your account has been deactivated. Please contact support.",
       });
-    }
-
-    // 2FA for admin
-    if (user.role === 'ADMIN') {
-      if (!otp) {
-        // Send OTP first
-        const generatedOtp = otpGenerator.generate(6, {
-          upperCaseAlphabets: false,
-          specialChars: false,
-          lowerCaseAlphabets: false,
-          digits: true,
-        });
-
-        await OTP.create({ email, otp: generatedOtp });
-
-        const mailOptions = {
-          from: `"HomeFind" <${process.env.NODE_MAIL}>`,
-          to: email,
-          subject: "HomeFind Admin — 2FA Verification Code 🔐",
-          html: `
-            <!DOCTYPE html>
-            <html>
-            <body style="margin: 0; padding: 0; background-color: #F4F4F4; font-family: Arial, sans-serif;">
-              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #F4F4F4; padding: 40px 0;">
-                <tr>
-                  <td align="center">
-                    <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 12px; overflow: hidden;">
-                      <tr>
-                        <td style="background-color: #1A2E4A; padding: 30px 40px; text-align: center;">
-                          <h1 style="color: #F5A623; margin: 0; font-size: 28px;">
-                            Home<span style="color: #ffffff;">Find</span>
-                          </h1>
-                          <p style="color: rgba(255,255,255,0.7); margin: 8px 0 0; font-size: 14px;">
-                            Admin 2FA Verification
-                          </p>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 40px; text-align: center;">
-                          <h2 style="color: #1A2E4A; margin: 0 0 16px;">Admin Login Verification 🛡️</h2>
-                          <p style="color: #555; margin: 0 0 24px;">
-                            Someone is attempting to login to the HomeFind admin panel. Use this code to verify.
-                          </p>
-                          <div style="background-color: #F4F4F4; border: 2px dashed #F5A623; border-radius: 12px; padding: 24px; margin: 0 0 24px;">
-                            <p style="color: #999; font-size: 13px; margin: 0 0 8px;">Your 2FA Code</p>
-                            <h1 style="color: #1A2E4A; font-size: 48px; letter-spacing: 16px; margin: 0; font-weight: bold;">
-                              ${generatedOtp}
-                            </h1>
-                            <p style="color: #dc3545; font-size: 13px; margin: 8px 0 0;">
-                              ⏱ Expires in 5 minutes
-                            </p>
-                          </div>
-                          <p style="color: #999; font-size: 13px;">
-                            If this wasn't you, secure your account immediately.
-                          </p>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style="background-color: #F4F4F4; padding: 20px 40px; text-align: center; border-top: 1px solid #e0e0e0;">
-                          <p style="color: #999; font-size: 12px; margin: 0;">
-                            © ${new Date().getFullYear()} HomeFind. All rights reserved.
-                          </p>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-            </body>
-            </html>
-          `,
-        };
-
-        await transporter.sendMail(mailOptions);
-        return res.status(200).send({ message: "2FA_REQUIRED", requires2FA: true });
-      }
-
-      // Verify OTP
-      const otpRecord = await OTP.findOne({ email });
-      if (!otpRecord || otpRecord.otp !== otp) {
-        return res.status(400).send({ message: "Invalid or expired 2FA code" });
-      }
-      await OTP.deleteOne({ email });
     }
 
     const token = await jwt.sign(
@@ -285,6 +206,7 @@ const login = async (req, res) => {
     res.status(404).send({ message: "Invalid credentials" });
   }
 };
+
 // REQUEST OTP
 const requestOTP = async (req, res) => {
   const { email } = req.body;
