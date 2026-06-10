@@ -56,7 +56,7 @@ app.use(cookieParser());
 // 5. Body parser
 app.use(express.json());
 
-
+app.set('trust proxy', 1); // add this before your rate limiter
 
 
 // 8. Global rate limiting — max 100 requests per 15 minutes
