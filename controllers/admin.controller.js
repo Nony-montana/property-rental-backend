@@ -149,6 +149,19 @@ const getAllChatsAdmin = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+const AuditLog = require("../models/auditLog.model");
+
+const getAuditLogs = async (req, res) => {
+  try {
+    const logs = await AuditLog.find()
+      .populate("admin", "firstName lastName email")
+      .sort({ createdAt: -1 })
+      .limit(100);
+    res.status(200).json({ message: "Audit logs fetched", data: logs });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 module.exports = {
   getDashboardStats,
@@ -160,4 +173,5 @@ module.exports = {
   toggleVerified,
   toggleFeatured,
   getAllChatsAdmin,
+  getAuditLogs,
 };
