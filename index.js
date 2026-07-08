@@ -62,7 +62,7 @@ app.set('trust proxy', 1); // add this before your rate limiter
 // 8. Global rate limiting — max 100 requests per 15 minutes
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 10,
   message: { message: "Too many requests, please try again later." },
 });
 app.use(globalLimiter);
@@ -74,7 +74,7 @@ const authLimiter = rateLimit({
   message: { message: "Too many attempts, please try again in 15 minutes." },
 });
 app.use("/api/auth/login", authLimiter);
-app.use("/api/auth/register", authLimiter);
+// app.use("/api/auth/register", authLimiter);
 app.use("/api/auth/request-otp", authLimiter);
 
 // ===========================
